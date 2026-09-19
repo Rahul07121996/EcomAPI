@@ -1,4 +1,4 @@
-name: API CD - Deploy to Azure (OIDC)
+name: API CD - Docker Image Deploy
 
 on:
   push:
@@ -6,22 +6,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build-push-deploy:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-dotnet@v4
-        with: { dotnet-version: "8.0.x" }
-
-      - run: dotnet restore EcomAPI/EcomAPI.csproj
-      - run: dotnet build EcomAPI/EcomAPI.csproj --no-restore -c Release
-      - run: dotnet test EcomAPI.Tests/EcomAPI.Tests.csproj --no-build -c Release || echo "No tests or tests failed but continue"
-      - run: dotnet publish EcomAPI/EcomAPI.csproj -c Release -o ${{ github.workspace }}/publish
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Login to Azure (OIDC)
         uses: azure/login@v2
@@ -30,8 +23,20 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Azure App Service
+      - name: Login to ACR
+        run: az acr login --name ecomacrrahul96
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ecomacrrahul96.azurecr.io/ecomapi:${{ github.sha }} -t ecomacrrahul96.azurecr.io/ecomapi:latest -f Dockerfile .
+
+      - name: Push to ACR
+        run: |
+          docker push ecomacrrahul96.azurecr.io/ecomapi:${{ github.sha }}
+          docker push ecomacrrahul96.azurecr.io/ecomapi:latest
+
+      - name: Deploy Image to App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ecom-api-rahul96
-          package: ${{ github.workspace }}/publish
+          images: ecomacrrahul96.azurecr.io/ecomapi:${{ github.sha }}
