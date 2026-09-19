@@ -1,0 +1,44 @@
+name: API CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  api-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore API
+        run: dotnet restore EcomAPI/EcomAPI.csproj
+
+      - name: Build API
+        run: dotnet build EcomAPI/EcomAPI.csproj --no-restore -c Release
+
+      - name: Restore Tests
+        run: dotnet restore EcomAPI.Tests/EcomAPI.Tests.csproj
+
+      - name: Build Tests
+        run: dotnet build EcomAPI.Tests/EcomAPI.Tests.csproj --no-restore -c Release
+
+      - name: Run Tests
+        run: dotnet test EcomAPI.Tests/EcomAPI.Tests.csproj --no-build -c Release --verbosity normal
+
+      - name: Publish API
+        run: dotnet publish EcomAPI/EcomAPI.csproj -c Release -o ${{ github.workspace }}/publish
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-artifact
+          path: ${{ github.workspace }}/publish
