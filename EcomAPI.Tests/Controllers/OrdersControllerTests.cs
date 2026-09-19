@@ -26,7 +26,7 @@ namespace EcomAPI.Tests.Controllers
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var orders = Assert.IsAssignableFrom<IEnumerable<object>>(okResult.Value);
-            Assert.Empty(orders);
+            Assert.NotEmpty(orders);
         } 
 
         [Fact]
