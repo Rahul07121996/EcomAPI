@@ -35,5 +35,13 @@ namespace EcomAPI.Controllers
            
             return Ok();
         }
+
+        [HttpGet("/Return")] // GET /api/Orders
+        public IActionResult Return()
+        {
+            // Example implementation
+
+            return Ok();
+        }
     }
 }
