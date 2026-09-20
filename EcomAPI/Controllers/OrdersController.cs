@@ -27,5 +27,13 @@ namespace EcomAPI.Controllers
             var orders = new List<string> { "OrderA", "OrderB", "OrderC" };
             return Ok(orders);
         }
+
+        [HttpGet("/healthy")] // GET /api/Orders
+        public IActionResult Healthy()
+        {
+            // Example implementation
+           
+            return Ok();
+        }
     }
 }
