@@ -49,12 +49,12 @@ namespace EcomAPI.Controllers
         }
 
 
-        [HttpGet("Healthy-Ok")]
-        public ActionResult HealthyOK()
-        {
+        //[HttpGet("Healthy-Ok")]
+        //public ActionResult HealthyOK()
+        //{
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
 
 
 
