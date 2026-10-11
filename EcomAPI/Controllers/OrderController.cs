@@ -45,6 +45,7 @@ namespace EcomAPI.Controllers
         public ActionResult Healthy()
         {
            
+
             return Ok();
         }
 
