@@ -4,13 +4,13 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["ecomapi/ecomapi.csproj", "ecomapi/"]
-RUN dotnet restore "ecomapi/ecomapi.csproj"
-COPY..
-WORKDIR "/src/ecomapi"
-RUN dotnet publish "ecomapi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+COPY ["EcomAPI/EcomAPI.csproj", "EcomAPI/"]
+RUN dotnet restore "EcomAPI/EcomAPI.csproj"
+COPY EcomAPI/ ./EcomAPI/
+WORKDIR "/src/EcomAPI"
+RUN dotnet publish "EcomAPI.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
-COPY --from=build /app/publish.
-ENTRYPOINT ["dotnet", "ecomapi.dll"]
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "EcomAPI.dll"]
