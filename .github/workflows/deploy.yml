@@ -20,7 +20,7 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ecomapirahul96.azurecr.io/ecomapi:${{ github.sha }} -t ecomapirahul96.azurecr.io/ecomapi:latest.
+          docker build -t ecomapirahul96.azurecr.io/ecomapi:${{ github.sha }} -t ecomapirahul96.azurecr.io/ecomapi:latest .
 
       - name: Push Image to ACR
         run: |
