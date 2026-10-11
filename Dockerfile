@@ -1,14 +1,16 @@
-# Build stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /source
-COPY EcomAPI/*.csproj .
-RUN dotnet restore
-COPY EcomAPI/ .
-RUN dotnet build -c Release
-
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-COPY --from=build /source/bin/Release/net8.0/ .
-EXPOSE 5080
-CMD ["dotnet", "EcomAPI.dll"]
+EXPOSE 80
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["ecomapi/ecomapi.csproj", "ecomapi/"]
+RUN dotnet restore "ecomapi/ecomapi.csproj"
+COPY..
+WORKDIR "/src/ecomapi"
+RUN dotnet publish "ecomapi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish.
+ENTRYPOINT ["dotnet", "ecomapi.dll"]

@@ -16,19 +16,19 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to ACR
-        run: az acr login --name ${{ secrets.ACR_NAME }}
+        run: az acr login --name ecomapirahul96
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:${{ github.sha }} -t ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:latest .
+          docker build -t ecomapirahul96.azurecr.io/ecomapi:${{ github.sha }} -t ecomapirahul96.azurecr.io/ecomapi:latest.
 
       - name: Push Image to ACR
         run: |
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:${{ github.sha }}
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:latest
+          docker push ecomapirahul96.azurecr.io/ecomapi:${{ github.sha }}
+          docker push ecomapirahul96.azurecr.io/ecomapi:latest
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          images: ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:${{ github.sha }}
+          images: ecomapirahul96.azurecr.io/ecomapi:${{ github.sha }}
