@@ -1,4 +1,4 @@
-name: Deploy to Azure Without Docker
+name: Deploy to Azure With Docker
 
 on:
   push:
@@ -6,28 +6,29 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.x"
-
-      - name: Build
-        run: dotnet build --configuration Release
-
-      - name: Publish
-        run: dotnet publish ecomapi/ecomapi.csproj -c Release -o ./publish
 
       - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy to Azure
+      - name: Login to ACR
+        run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:${{ github.sha }} -t ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:latest.
+
+      - name: Push Image to ACR
+        run: |
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:${{ github.sha }}
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:latest
+
+      - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          package: ./publish
+          images: ${{ secrets.ACR_NAME }}.azurecr.io/ecomapi:${{ github.sha }}
